@@ -7,6 +7,7 @@ import org.testng.annotations.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 import static org.hamcrest.Matchers.equalTo;
 
@@ -86,4 +87,32 @@ public class RegisterUserTest {
                 .body("success", equalTo(true))
                 .body("data.email", equalTo(registeredEmail));
     }
+
+    @Test
+    public void updateUserProfileTest() throws UnsupportedEncodingException {
+        loginUserTest();
+
+        Assert.assertNotNull(authToken, "AUTH_TOKEN environment variable is not set");
+
+        String encodedBody = "name=" + URLEncoder.encode("Boris", "UTF-8") +
+                "&phone=" + URLEncoder.encode("4085551212", "UTF-8") +
+                "&company=" + URLEncoder.encode("O'Reilly", "UTF-8");
+;
+
+        RestAssured
+                .given()
+                .header("accept", "application/json")
+                .header("x-auth-token", authToken)
+                .header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .body(encodedBody)
+                .when()
+                .patch("https://practice.expandtesting.com/notes/api/users/profile")
+                .then()
+                .statusCode(200)
+                .body("success", equalTo(true))
+                .body("data.name", equalTo("Boris"))
+                .body("data.phone", equalTo("4085551212"))
+                .body("data.company", equalTo("O'Reilly"));
+    }
+
 }
