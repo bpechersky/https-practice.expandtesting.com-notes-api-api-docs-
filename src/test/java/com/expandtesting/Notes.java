@@ -86,4 +86,5 @@ public class Notes {
                 .body("data.id", equalTo(noteId))
                 .body("data.title", equalTo("Best Title of the note"));
     }
+
 }
