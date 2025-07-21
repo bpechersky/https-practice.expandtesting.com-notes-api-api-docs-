@@ -112,6 +112,23 @@ public class Notes {
                 .body("message", containsString("Updated"));
     }
 
+    @Test
+    public void patchNoteTest() {
+        createNoteTest();
+
+        given()
+                .log().all()
+                .baseUri("https://practice.expandtesting.com")
+                .basePath("/notes/api/notes/" + noteId)
+                .header("x-auth-token", authToken)
+                .header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .formParam("completed", "true")
+                .when()
+                .patch()
+                .then()
+                .log().all()
+                .statusCode(200);
+    }
 
 
 
