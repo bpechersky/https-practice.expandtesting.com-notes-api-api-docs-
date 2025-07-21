@@ -16,7 +16,7 @@ public class RegisterUserTest {
 
     private static String registeredEmail;
     private static String registeredUserId;
-    private static String authToken;
+    public static String authToken;
     String password = "Test123";
 
 
