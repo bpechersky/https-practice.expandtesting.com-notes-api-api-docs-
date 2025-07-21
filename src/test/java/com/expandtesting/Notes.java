@@ -1,6 +1,7 @@
 package com.expandtesting;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -85,6 +86,33 @@ public class Notes {
                 .body("success", equalTo(true))
                 .body("data.id", equalTo(noteId))
                 .body("data.title", equalTo("Best Title of the note"));
+
     }
+
+    @Test
+    public void updateNoteTest() {
+        // Ensure note is created before updating
+        createNoteTest();  // This sets noteId
+
+        given()
+                .baseUri("https://practice.expandtesting.com")
+                .basePath("/notes/api/notes/" + noteId)
+                .header("accept", "application/json")
+                .header("x-auth-token", RegisterUserTest.authToken)
+                .contentType(ContentType.JSON)
+                .body("{ \"title\": \"Updated title of the note\", " +
+                        "\"description\": \"Updated descripton of the note\", " +
+                        "\"completed\": true, " +
+                        "\"category\": \"Home\" }")
+                .when()
+                .put()
+                .then()
+                .statusCode(200)
+                .body("success", equalTo(true))
+                .body("message", containsString("Updated"));
+    }
+
+
+
 
 }
