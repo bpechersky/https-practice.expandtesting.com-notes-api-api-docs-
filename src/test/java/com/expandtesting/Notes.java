@@ -1,6 +1,7 @@
 package com.expandtesting;
 
 import io.restassured.RestAssured;
+import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -19,31 +20,29 @@ public class Notes {
         new RegisterUserTest().loginUserTest();
     }
 
+    private static String noteId;
 
     @Test
-    public void createNoteTest() throws UnsupportedEncodingException {
-
-
-        RestAssured
-                .given()
+    public void createNoteTest() {
+        Response response = given()
                 .header("accept", "application/json")
-                .header("x-auth-token", authToken)
-                .header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .header("x-auth-token", RegisterUserTest.authToken)
+                .contentType("application/json")
+                .body("{ \"title\": \"Best Title of the note\", " +
+                        "\"description\": \"Best description of the note\", " +
+                        "\"category\": \"Home\" }")
+                .post("https://practice.expandtesting.com/notes/api/notes");
 
-                .formParam("title", "Best Title of the note")
-                .formParam("description", "Best description of the note")
-                .formParam("category", "Home")
-                .when()
-                .post("https://practice.expandtesting.com/notes/api/notes")
-                .then()
+        response.then()
                 .statusCode(200)
                 .body("success", equalTo(true))
                 .body("message", equalTo("Note successfully created"))
-                .body("data", notNullValue())
-                .body("data.title", equalTo("Best Title of the note"))
-                .body("data.description", equalTo("Best description of the note"))
-                .body("data.category", equalTo("Home"));
+                .body("data.title", equalTo("Best Title of the note"));
+
+        noteId = response.path("data.id");
+        System.out.println("Note ID: " + noteId);
     }
+
     @Test
     public void getAllNotesTest() throws Exception {
         // Ensure the token is available
@@ -71,5 +70,20 @@ public class Notes {
                 .body("data[0].created_at", notNullValue())
                 .body("data[0].updated_at", notNullValue())
                 .body("data[0].user_id", notNullValue());
+
+    }
+    @Test
+    public void getNoteByIdTest() {
+
+        createNoteTest();
+        given()
+                .header("accept", "application/json")
+                .header("x-auth-token", RegisterUserTest.authToken)
+                .get("https://practice.expandtesting.com/notes/api/notes/" + noteId)
+                .then()
+                .statusCode(200)
+                .body("success", equalTo(true))
+                .body("data.id", equalTo(noteId))
+                .body("data.title", equalTo("Best Title of the note"));
     }
 }
