@@ -135,5 +135,37 @@ public class RegisterUserTest {
                         " sent to " + email));
     }
 
+    @Test
+    public void logoutUserTest() throws UnsupportedEncodingException {
+
+        loginUserTest();
+        RestAssured
+                .given()
+                .header("accept", "application/json")
+                .header("x-auth-token", authToken)
+                .when()
+                .delete("https://practice.expandtesting.com/notes/api/users/logout")
+                .then()
+                .statusCode(200)
+                .body("success", equalTo(true))
+                .body("message", equalTo("User has been successfully logged out"));
+    }
+
+    @Test
+    public void deleteAccountTest() throws UnsupportedEncodingException {
+        loginUserTest();
+
+        RestAssured
+                .given()
+                .header("accept", "application/json")
+                .header("x-auth-token", authToken)
+                .when()
+                .delete("https://practice.expandtesting.com/notes/api/users/delete-account")
+                .then()
+                .statusCode(200)
+                .body("success", equalTo(true))
+                .body("message", equalTo("Account successfully deleted"));
+    }
+
 
 }
