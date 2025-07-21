@@ -9,6 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 public class RegisterUserTest {
@@ -114,5 +115,25 @@ public class RegisterUserTest {
                 .body("data.phone", equalTo("4085551212"))
                 .body("data.company", equalTo("O'Reilly"));
     }
+    @Test
+    public void forgotPasswordTest() throws UnsupportedEncodingException {
+        String email = "bp@gmail.com";
+
+        String encodedBody = "email=" + URLEncoder.encode(email, "UTF-8");
+
+        RestAssured
+                .given()
+                .header("accept", "application/json")
+                .header("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .body(encodedBody)
+                .when()
+                .post("https://practice.expandtesting.com/notes/api/users/forgot-password")
+                .then()
+                .statusCode(200)
+                .body("success", equalTo(true))
+                .body("message", containsString("Password reset link successfully" +
+                        " sent to " + email));
+    }
+
 
 }
