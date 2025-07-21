@@ -130,6 +130,23 @@ public class Notes {
                 .statusCode(200);
     }
 
+    @Test
+    public void deleteNoteTest() {
+        patchNoteTest();
 
+        RestAssured.baseURI = "https://practice.expandtesting.com";
+
+        given()
+                .log().all()
+                .header("accept", "application/json")
+                .header("x-auth-token", authToken)
+                .when()
+                .delete("/notes/api/notes/" + noteId)
+                .then()
+                .log().all()
+                .statusCode(200)
+                .body("success", equalTo(true))
+                .body("message", equalTo("Note successfully deleted"));
+    }
 
 }
